@@ -54,59 +54,84 @@ public class MatchingProfileRepositoryCustomImpl implements MatchingProfileRepos
     }
 
     private BooleanExpression provinceEq(Province province) {
-        return (province != null && province != Province.NONE) ? matchingProfile.province.eq(province) : null;
+        if (province != null && province != Province.NONE) {
+            return matchingProfile.province.eq(province)
+                    .or(matchingProfile.province.eq(Province.NONE));
+        }
+        return null;
     }
 
     private BooleanExpression groupTypeEq(GroupType groupType) {
-        return (groupType != null && groupType != GroupType.NONE) ? matchingProfile.groupType.eq(groupType) : null;
+        if (groupType != null && groupType != GroupType.NONE) {
+            return matchingProfile.groupType.eq(groupType)
+                    .or(matchingProfile.groupType.eq(GroupType.NONE));
+        }
+        return null;
     }
 
     private BooleanExpression ageRangeEq(Integer ageRange) {
-        if (ageRange == null) {
+        if (ageRange == null || ageRange == 0) {
             return null;
         }
+
+        BooleanExpression ageCondition;
+
         switch (ageRange) {
             case 10:
-                return userEntity.age.between(10, 19);
+                ageCondition = userEntity.age.between(10, 19);
+                break;
             case 20:
-                return userEntity.age.between(20, 29);
+                ageCondition = userEntity.age.between(20, 29);
+                break;
             case 30:
-                return userEntity.age.between(30, 39);
+                ageCondition = userEntity.age.between(30, 39);
+                break;
             case 40:
-                return userEntity.age.between(40, 49);
+                ageCondition = userEntity.age.between(40, 49);
+                break;
             case 50:
-                return userEntity.age.between(50, 59);
+                ageCondition = userEntity.age.between(50, 59);
+                break;
             case 60:
-                return userEntity.age.goe(60);
+                ageCondition = userEntity.age.goe(60);
+                break;
             default:
                 return null;
         }
-    }
 
-    private BooleanExpression cityEq(List<MatchCity> cites) {
-        if (cites == null || cites.isEmpty()) {
-            return null;
-        }
-        // NONE 필터 처리
-        List<City> cities = cites.stream()
-                .map(MatchCity::getCity)
-                .filter(city -> city != null && !city.equals(City.NONE))
-                .collect(Collectors.toList());
-
-        return cities.isEmpty() ? null : matchCity.city.in(cities);
+        return ageCondition.or(userEntity.age.isNull());
     }
 
     private BooleanExpression travelStyleEq(List<MatchTravelStyle> travelStyles) {
         if (travelStyles == null || travelStyles.isEmpty()) {
             return null;
         }
-        // NONE 필터 처리
+
         List<TravelStyle> styles = travelStyles.stream()
                 .map(MatchTravelStyle::getTravelStyle)
                 .filter(style -> style != null && style != TravelStyle.NONE)
                 .collect(Collectors.toList());
 
-        return styles.isEmpty() ? null : matchTravelStyle.travelStyle.in(styles);
+        return styles.isEmpty() ?
+                null :
+                matchTravelStyle.travelStyle.in(styles)
+                        .or(matchTravelStyle.travelStyle.eq(TravelStyle.NONE));
+    }
+
+    private BooleanExpression cityEq(List<MatchCity> cities) {
+        if (cities == null || cities.isEmpty()) {
+            return null;
+        }
+
+        List<City> cityList = cities.stream()
+                .map(MatchCity::getCity)
+                .filter(city -> city != null && city != City.NONE)
+                .collect(Collectors.toList());
+
+        return cityList.isEmpty() ?
+                null :
+                matchCity.city.in(cityList)
+                        .or(matchCity.city.eq(City.NONE));
     }
 
     private BooleanExpression preferenceGenderEq(PreferenceGender preferenceGender) {
