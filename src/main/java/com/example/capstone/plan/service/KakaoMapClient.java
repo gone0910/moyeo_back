@@ -210,6 +210,33 @@ public class KakaoMapClient {
             throw new RuntimeException("KakaoMap 재조회 전용 검색 오류", e);
         }
     }
+    public KakaoPlaceDto searchPlaceByCoordinate(String keyword, double lat, double lng) {
+        try {
+            String url = String.format(
+                    "https://dapi.kakao.com/v2/local/search/keyword.json?query=%s&x=%f&y=%f&radius=1000",
+                    keyword, lng, lat
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "KakaoAK " + kakaoApiKey);
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<String> response = getRestTemplate()
+                    .exchange(url, HttpMethod.GET, entity, String.class);
+
+            JsonNode documents = objectMapper.readTree(response.getBody()).get("documents");
+
+            if (documents != null && documents.size() > 0) {
+                return extractPlaceFromJson(documents.get(0)); // 첫 결과 반환
+            }
+
+            return null;
+
+        } catch (Exception e) {
+            throw new RuntimeException("KakaoMap 좌표 기반 검색 오류", e);
+        }
+    }
+
 
     // JSON → DTO 변환
     private KakaoPlaceDto extractPlaceFromJson(JsonNode doc) {
