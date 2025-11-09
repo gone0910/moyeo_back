@@ -27,7 +27,7 @@ public class PlaceDetailService {
             String description = descNode.path("description").asText("");
 
             // 2) KakaoMap 장소 검색
-            KakaoPlaceDto place = kakaoMapClient.searchPlace(request.getName());
+            KakaoPlaceDto place = kakaoMapClient.searchPlaceByCoordinate(request.getName(), request.getLat(), request.getLng());
 
             return PlaceDetailResDto.builder()
                     .name(request.getName())

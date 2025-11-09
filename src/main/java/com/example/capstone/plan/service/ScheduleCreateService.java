@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -31,6 +32,12 @@ public class ScheduleCreateService {
 
     public ScheduleCreateResDto generateSchedule(ScheduleCreateReqDto request) {
         try {
+            // 0. 날짜 유효성 검증 (startDate 확인)
+            LocalDate today = LocalDate.now();
+
+            if (request.getStartDate().isBefore(today)) {
+                throw new IllegalArgumentException("오늘 이전 날짜로는 일정을 생성할 수 없습니다.");
+            }
 
             // 1. GPT 프롬프트로 장소 구조 생성
             String prompt = gptCreatePromptBuilder.build(request);
