@@ -33,8 +33,8 @@ public class GeminiClient {
      */
     public String callGemini(String prompt) {
         RestTemplate restTemplate = restTemplateBuilder
-                .setConnectTimeout(Duration.ofSeconds(5))  // 연결 타임아웃
-                .setReadTimeout(Duration.ofSeconds(30))    // 응답 타임아웃
+                .setConnectTimeout(Duration.ofSeconds(10))  // 연결 타임아웃
+                .setReadTimeout(Duration.ofSeconds(60))    // 응답 타임아웃
                 .build();
 
         try {

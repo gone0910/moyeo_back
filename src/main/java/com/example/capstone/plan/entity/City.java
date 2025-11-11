@@ -93,7 +93,7 @@ public enum City {
     HONGSEONG_GUN("홍성군", 34, 8),
     TAEAN_GUN("태안군", 34, 9),
     GYERYONG_SI("계룡시", 34, 10),
-    BOREONG_SI("보령시", 34, 11),
+    BORYEONG_SI("보령시", 34, 11),
 
     // 전라북도 (areaCode: 35)
     JEONJU_SI("전주시", 35, 1),
