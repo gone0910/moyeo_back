@@ -75,15 +75,20 @@ public class ScheduleEditService {
             Integer driveTime = null;
             Integer transitTime = null;
 
-            // 첫 장소가 아니고, 좌표가 유효하면 이동시간 계산
             if (prev != null && valid(prev.getLat(), prev.getLng()) && valid(currLat, currLng)) {
-                int walk    = tmapRouteService.getTime("walk",    prev.getLat(), prev.getLng(), currLat, currLng);
-                int drive   = tmapRouteService.getTime("drive",   prev.getLat(), prev.getLng(), currLat, currLng);
-                int transit = tmapRouteService.getTime("transit", prev.getLat(), prev.getLng(), currLat, currLng);
-                // 실패 시 -1 반환하는 관례 유지 → 그대로 저장
-                walkTime = walk;
-                driveTime = drive;
-                transitTime = transit;
+                try {
+                    int walk    = tmapRouteService.getTime("walk",    prev.getLat(), prev.getLng(), currLat, currLng);
+                    int drive   = tmapRouteService.getTime("drive",   prev.getLat(), prev.getLng(), currLat, currLng);
+                    int transit = tmapRouteService.getTime("transit", prev.getLat(), prev.getLng(), currLat, currLng);
+
+                    walkTime = walk;
+                    driveTime = drive;
+                    transitTime = transit;
+                } catch (Exception e) {
+                    walkTime = -1;
+                    driveTime = -1;
+                    transitTime = -1;
+                }
             }
 
             PlaceResponse place = PlaceResponse.builder()
